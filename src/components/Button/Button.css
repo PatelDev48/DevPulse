@@ -1,0 +1,64 @@
+/* Reusable button styles (works for <button> and Link-rendered buttons). */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 800;
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    transform 0.15s ease,
+    box-shadow 0.2s ease,
+    background 0.2s ease;
+}
+
+.btn--primary {
+  min-height: 46px;
+  padding: 0 18px;
+  background: var(--teal);
+  color: #fff;
+}
+
+.btn--primary:hover {
+  background: #115e59;
+  box-shadow: 0 12px 26px rgba(15, 118, 110, 0.22);
+}
+
+.btn--primary:active {
+  transform: translateY(1px);
+}
+
+.btn--nav {
+  min-height: 40px;
+  padding: 0 16px;
+  background: var(--teal);
+  color: #fff;
+}
+
+.btn--nav:hover {
+  background: #115e59;
+  box-shadow: 0 12px 26px rgba(15, 118, 110, 0.22);
+}
+
+.btn--nav:active {
+  transform: translateY(1px);
+}
+
+.btn--secondary {
+  min-height: 46px;
+  padding: 0 18px;
+  background: transparent;
+  color: #d9f8f4;
+}
+
+.btn--secondary:hover {
+  text-decoration: underline;
+}
+
+.btn--block {
+  width: 100%;
+}

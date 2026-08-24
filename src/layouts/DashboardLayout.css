@@ -1,0 +1,14 @@
+/* Shared shell for dashboard/app pages. */
+
+.dashboard-shell {
+  width: min(1180px, calc(100% - 40px));
+  margin: 0 auto;
+  padding: 24px 0 48px;
+}
+
+@media (max-width: 680px) {
+  .dashboard-shell {
+    width: min(100% - 28px, 1180px);
+    padding-top: 16px;
+  }
+}

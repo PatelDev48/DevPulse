@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import "./App.css";
+import Button from "../../components/Button/Button";
+import "../../styles/auth.css";
 
 const highlights = [
   "Create a team-ready account in under a minute",
@@ -111,9 +112,9 @@ export default function Signup() {
 
           {error && <p className="auth-error">{error}</p>}
 
-          <button type="submit" className="auth-button">
+          <Button type="submit" variant="primary" block>
             Create account
-          </button>
+          </Button>
 
           <p className="auth-footer">
             Already have an account? <Link to="/login">Sign in</Link>

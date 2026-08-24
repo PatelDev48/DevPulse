@@ -12,6 +12,18 @@
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+
+  /* DevPulse design tokens (shared across pages) */
+  --ink: #102033;
+  --muted: #667085;
+  --line: #d9e2ec;
+  --paper: #ffffff;
+  --soft: #f6f8fb;
+  --navy: #102033;
+  --teal: #0f766e;
+  --blue: #2563eb;
+  --amber: #b7791f;
+  --shadow: 0 18px 44px rgba(16, 32, 51, 0.1);
 }
 
 * {

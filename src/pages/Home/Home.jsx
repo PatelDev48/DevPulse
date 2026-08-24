@@ -1,5 +1,5 @@
-import { Link } from "react-router-dom";
-import "./App.css";
+import Button from "../../components/Button/Button";
+import "./Home.css";
 
 const stats = [
   { label: "Open tasks", value: "24", change: "+6 this week" },
@@ -46,24 +46,7 @@ const members = [
 
 export default function Home() {
   return (
-    <main className="dashboard-shell">
-      <nav className="dashboard-nav" aria-label="Primary navigation">
-        <Link className="brand" to="/home">
-          <span className="brand-mark">DP</span>
-          <span>
-            <strong>DevPulse</strong>
-            <small>Developer productivity tracker</small>
-          </span>
-        </Link>
-
-        <div className="nav-actions">
-          <Link to="/login">Log in</Link>
-          <Link className="nav-button" to="/signup">
-            Create account
-          </Link>
-        </div>
-      </nav>
-
+    <>
       <section className="dashboard-hero">
         <div className="hero-content">
           <p className="section-kicker">Real-time engineering visibility</p>
@@ -74,12 +57,12 @@ export default function Home() {
           </p>
 
           <div className="hero-actions">
-            <Link className="primary-action" to="/signup">
+            <Button to="/signup" variant="primary">
               Start tracking
-            </Link>
-            <Link className="secondary-action" to="/login">
+            </Button>
+            <Button to="/login" variant="secondary">
               View demo access
-            </Link>
+            </Button>
           </div>
         </div>
 
@@ -166,6 +149,6 @@ export default function Home() {
           </div>
         </aside>
       </section>
-    </main>
+    </>
   );
 }

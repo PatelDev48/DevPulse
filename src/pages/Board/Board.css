@@ -1,0 +1,69 @@
+/* Styles for the Board page (placeholder). */
+
+.board-page {
+  margin-top: 18px;
+}
+
+.board-page h1 {
+  margin: 0;
+  color: var(--ink);
+  font-size: 30px;
+  line-height: 1.15;
+}
+
+.board-columns {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.board-column {
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--soft);
+}
+
+.board-column header {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 12px;
+  color: var(--ink);
+  font-size: 14px;
+}
+
+.board-column header span {
+  min-width: 26px;
+  height: 24px;
+  display: inline-grid;
+  place-items: center;
+  border-radius: 999px;
+  background: #e2f3f1;
+  color: var(--teal);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.board-column p {
+  margin: 10px 0 0;
+  padding: 12px;
+  border: 1px solid #e4e9ef;
+  border-radius: 8px;
+  background: #fff;
+  color: #344054;
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+@media (max-width: 1040px) {
+  .board-columns {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 680px) {
+  .board-columns {
+    grid-template-columns: 1fr;
+  }
+}
