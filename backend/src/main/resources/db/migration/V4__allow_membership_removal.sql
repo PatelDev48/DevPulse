@@ -1,0 +1,1 @@
+GRANT DELETE ON TABLE devpulse.team_memberships TO devpulse_app;

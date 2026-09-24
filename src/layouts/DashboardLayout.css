@@ -1,14 +1,13 @@
-/* Shared shell for dashboard/app pages. */
-
-.dashboard-shell {
-  width: min(1180px, calc(100% - 40px));
-  margin: 0 auto;
-  padding: 24px 0 48px;
-}
-
-@media (max-width: 680px) {
-  .dashboard-shell {
-    width: min(100% - 28px, 1180px);
-    padding-top: 16px;
-  }
-}
+.dashboard-shell { min-height: 100svh; }
+.workspace-main { min-width: 0; margin-left: 244px; min-height: 100svh; display: flex; flex-direction: column; }
+.workspace-topbar { min-height: 72px; padding: 18px 36px; display: flex; justify-content: space-between; align-items: center; gap: 16px; border-bottom: 1px solid var(--line); background: #ffffffb8; }
+.workspace-topbar > div, .workspace-topbar time { display: flex; align-items: center; gap: 10px; font-size: 12px; }
+.workspace-topbar a { color: var(--muted); text-decoration: none; }.workspace-topbar a:hover { color: var(--teal); }
+.workspace-topbar svg, .workspace-topbar time { color: var(--muted); }
+.workspace-content { width: 100%; max-width: 1580px; padding: 34px 36px 28px; margin: 0 auto; flex: 1; min-width: 0; }
+.workspace-content > section { margin-top: 0; }
+.workspace-footer { padding: 18px 36px; display: flex; justify-content: space-between; gap: 16px; border-top: 1px solid var(--line); font-size: 11px; color: #859087; }
+.workspace-footer span:first-child { font-family: var(--display); font-weight: 700; }
+@media (max-width: 1200px) { .workspace-content { padding: 28px 24px; }.workspace-topbar { padding-inline: 24px; } }
+@media (max-width: 900px) { .workspace-main { margin-left: 0; }.workspace-topbar { min-height: 54px; }.workspace-content { padding: 26px 22px; } }
+@media (max-width: 560px) { .workspace-content { padding: 24px 16px; }.workspace-topbar { padding-inline: 16px; }.workspace-topbar time { font-size: 10px; }.workspace-footer { padding: 18px 16px; } }

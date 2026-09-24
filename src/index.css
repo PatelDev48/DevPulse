@@ -1,53 +1,58 @@
 :root {
-  font-family:
-    Inter, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-family: "DM Sans Variable", sans-serif;
   line-height: 1.5;
   font-weight: 400;
-  color: #0f172a;
-  background:
-    radial-gradient(circle at top left, rgba(15, 118, 110, 0.14), transparent 28%),
-    radial-gradient(circle at bottom right, rgba(37, 99, 235, 0.12), transparent 30%),
-    linear-gradient(180deg, #e2e8f0 0%, #f8fafc 45%, #eef2f7 100%);
+  letter-spacing: 0;
+  color: #26342f;
+  background: #f7f9f8;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-
-  /* DevPulse design tokens (shared across pages) */
-  --ink: #102033;
-  --muted: #667085;
-  --line: #d9e2ec;
-  --paper: #ffffff;
-  --soft: #f6f8fb;
-  --navy: #102033;
-  --teal: #0f766e;
-  --blue: #2563eb;
-  --amber: #b7791f;
-  --shadow: 0 18px 44px rgba(16, 32, 51, 0.1);
+  --ink: #26342f;
+  --muted: #6e7a75;
+  --line: #e3e9e6;
+  --paper: #fff;
+  --soft: #f5f8f6;
+  --navy: #26342f;
+  --teal: #087e70;
+  --blue: #5179be;
+  --amber: #b88028;
+  --shadow: 0 18px 60px rgb(38 52 47 / 12%);
+  --display: "Manrope Variable", sans-serif;
 }
-
-* {
-  box-sizing: border-box;
-}
-
-html,
-body,
-#root {
-  min-height: 100%;
-  margin: 0;
-}
-
-body {
-  min-height: 100svh;
-}
-
-button,
-input {
-  font: inherit;
-}
-
-button:focus-visible,
-input:focus-visible {
-  outline: 3px solid rgba(15, 118, 110, 0.35);
-  outline-offset: 2px;
-}
+* { box-sizing: border-box; }
+html, body, #root { min-height: 100%; margin: 0; }
+body { min-height: 100svh; }
+button, input, select, textarea { font: inherit; }
+button, a, input, select, textarea { -webkit-tap-highlight-color: transparent; }
+button:not(:disabled), select:not(:disabled) { cursor: pointer; }
+button:disabled { cursor: not-allowed; }
+:focus-visible { outline: 3px solid #53ad9f; outline-offset: 3px; }
+::selection { background: #cceae3; color: #15483f; }
+h1, h2, h3 { font-family: var(--display); letter-spacing: 0; overflow-wrap: anywhere; }
+svg { flex-shrink: 0; }
+.brand { display: inline-flex; align-items: center; gap: 10px; color: var(--ink); font-family: var(--display); font-size: 23px; font-weight: 800; text-decoration: none; flex-shrink: 0; }
+.brand img { display: block; }
+.brand-period { color: var(--teal); }
+.brand--compact { font-size: 20px; }
+.section-kicker { margin: 0 0 6px; color: var(--teal); font-size: 12px; font-weight: 650; }
+.section-heading { display: flex; align-items: center; justify-content: space-between; gap: 20px; margin-bottom: 26px; }
+.section-heading h1 { margin: 0; font-size: 30px; line-height: 1.25; }
+.page-description { margin: 10px 0 0; color: var(--muted); font-size: 14px; }
+.workspace-search { display: flex; align-items: center; gap: 10px; min-width: 0; min-height: 44px; padding: 0 12px; background: var(--paper); border: 1px solid var(--line); border-radius: 6px; color: var(--muted); }
+.workspace-search:focus-within { border-color: var(--teal); }
+.workspace-search input { width: 100%; min-width: 0; min-height: 42px; border: 0; background: transparent; color: var(--ink); font-size: 13px; outline: none; }
+.workspace-create { border-block: 1px solid var(--line); margin-bottom: 24px; }
+.workspace-create > summary { display: flex; align-items: center; gap: 8px; padding: 16px 0; color: var(--teal); font-size: 13px; font-weight: 600; cursor: pointer; list-style: none; }
+.workspace-create > summary::-webkit-details-marker { display: none; }
+.workspace-create[open] > summary { border-bottom: 1px solid var(--line); }
+.workspace-create[open] > summary svg { transform: rotate(45deg); }
+.workspace-create form { margin: 20px 0; }
+.workspace-create .project-create { padding-top: 0; border: 0; }
+.workspace-create label { font-size: 12px; }
+.skip-link { position: fixed; top: -70px; left: 16px; z-index: 100; padding: 12px 18px; background: var(--ink); color: white; border-radius: 6px; }
+.skip-link:focus { top: 12px; }
+dialog { box-shadow: var(--shadow); }
+dialog::backdrop { backdrop-filter: blur(3px); }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; scroll-behavior: auto !important; } }

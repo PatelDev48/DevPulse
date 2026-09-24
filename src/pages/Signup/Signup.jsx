@@ -1,24 +1,28 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, Navigate, useLocation, useNavigate } from "react-router-dom";
+import { ArrowRight } from "lucide-react";
+import AuthLayout from "../../layouts/AuthLayout";
+import PasswordField from "../../components/PasswordField/PasswordField";
+import { useAuth } from "../../context/AuthContext";
 import Button from "../../components/Button/Button";
-import "../../styles/auth.css";
-
-const highlights = [
-  "Create a team-ready account in under a minute",
-  "Prepare for tasks, roles, analytics, and live updates",
-  "Keep early MVP onboarding simple and professional",
-];
+import { signup as signupRequest } from "../../services/authService";
+import { authDestination } from "../../routes/authDestination";
 
 export default function Signup() {
   const navigate = useNavigate();
+  const location = useLocation();
+  const { isAuthenticated } = useAuth();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
+  const [submitting, setSubmitting] = useState(false);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (submitting) return;
 
     if (!name.trim() || !email.trim() || !password.trim() || !confirmPassword.trim()) {
       setError("Please complete all fields.");
@@ -30,32 +34,31 @@ export default function Signup() {
       return;
     }
 
+    if (password.length < 15 || password.length > 72 || new TextEncoder().encode(password).length > 72) {
+      setError("Use at least 15 characters and no more than 72 UTF-8 bytes for your password.");
+      return;
+    }
+
     setError("");
-    console.log("Signing up:", { name, email, password });
-    navigate("/home");
+    setSubmitting(true);
+    try {
+      const user = await signupRequest({ name: name.trim(), email: email.trim(), password });
+      navigate("/login", { replace: true, state: {
+        signupComplete: true, email: user.email, from: authDestination(location.state?.from),
+      } });
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setSubmitting(false);
+    }
   };
 
+  if (isAuthenticated) return <Navigate to={authDestination(location.state?.from)} replace />;
   return (
-    <main className="auth-shell">
-      <section className="auth-panel auth-panel--intro" aria-label="Product overview">
-        <p className="auth-eyebrow">Start DevPulse</p>
-        <h1 className="auth-headline">Create your workspace for real-time team visibility</h1>
-        <p className="auth-copy">
-          Set up access for a lightweight productivity tracker built around
-          Kanban flow, live activity, and clear delivery metrics.
-        </p>
-
-        <ul className="auth-points" aria-label="Benefits">
-          {highlights.map((point) => (
-            <li key={point}>{point}</li>
-          ))}
-        </ul>
-      </section>
-
-      <section className="auth-card" aria-label="Signup form">
+    <AuthLayout signup>
         <div className="auth-card__header">
           <p className="auth-tag">Get started</p>
-          <h2 className="auth-title">Create your account</h2>
+          <h1 className="auth-title">Create your account</h1>
           <p className="auth-subtitle">
             Enter your details below to set up your workspace.
           </p>
@@ -69,6 +72,9 @@ export default function Signup() {
               className="auth-input"
               placeholder="John Smith"
               autoComplete="name"
+              required
+              maxLength={100}
+              disabled={submitting}
               value={name}
               onChange={(e) => setName(e.target.value)}
             />
@@ -81,46 +87,48 @@ export default function Signup() {
               className="auth-input"
               placeholder="name@company.com"
               autoComplete="email"
+              required
+              maxLength={254}
+              disabled={submitting}
               value={email}
               onChange={(e) => setEmail(e.target.value)}
             />
           </label>
 
-          <label className="auth-field">
-            <span>Password</span>
-            <input
-              type="password"
-              className="auth-input"
+            <PasswordField
+              id="signup-password"
+              aria-describedby="signup-password-hint"
               placeholder="Create a password"
               autoComplete="new-password"
+              required
+              minLength={15}
+              maxLength={72}
+              disabled={submitting}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
             />
-          </label>
-
-          <label className="auth-field">
-            <span>Confirm password</span>
-            <input
-              type="password"
-              className="auth-input"
+          <p className="auth-password-hint" id="signup-password-hint">15 or more characters. Up to 72 UTF-8 bytes.</p>
+            <PasswordField
+              id="signup-confirm-password"
+              label="Confirm password"
               placeholder="Repeat your password"
               autoComplete="new-password"
+              required
+              disabled={submitting}
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
             />
-          </label>
 
-          {error && <p className="auth-error">{error}</p>}
+          {error && <p className="auth-error" role="alert">{error}</p>}
 
-          <Button type="submit" variant="primary" block>
-            Create account
+          <Button type="submit" variant="primary" block disabled={submitting}>
+            {submitting ? "Creating account\u2026" : "Create account"}<ArrowRight size={17} aria-hidden="true" />
           </Button>
 
           <p className="auth-footer">
-            Already have an account? <Link to="/login">Sign in</Link>
+            Already have an account? <Link to="/login" state={{ from: authDestination(location.state?.from) }}>Sign in</Link>
           </p>
         </form>
-      </section>
-    </main>
+    </AuthLayout>
   );
 }

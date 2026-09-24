@@ -1,154 +1,30 @@
+import { Navigate, Link } from "react-router-dom";
+import { ArrowUpRight, ArrowRight, Layers3, ChartNoAxesCombined, UsersRound } from "lucide-react";
 import Button from "../../components/Button/Button";
-import "./Home.css";
-
-const stats = [
-  { label: "Open tasks", value: "24", change: "+6 this week" },
-  { label: "Done today", value: "8", change: "32% faster close rate" },
-  { label: "Avg. time to close", value: "2.4d", change: "-18% vs last week" },
-  { label: "Live updates", value: "14", change: "Last 60 minutes" },
-];
-
-const board = [
-  {
-    title: "To Do",
-    count: 6,
-    tasks: ["Add invite link flow", "Create team settings view"],
-  },
-  {
-    title: "In Progress",
-    count: 9,
-    tasks: ["JWT refresh token handling", "Task status API validation"],
-  },
-  {
-    title: "In Review",
-    count: 4,
-    tasks: ["Dashboard summary query", "Activity feed UI states"],
-  },
-  {
-    title: "Done",
-    count: 5,
-    tasks: ["Signup form polish", "Professional auth layout"],
-  },
-];
-
-const activity = [
-  "Priya moved Dashboard summary query to In Review",
-  "Arjun created Task status API validation",
-  "Dev completed Professional auth layout",
-  "Meera assigned Invite link flow to herself",
-];
-
-const members = [
-  { name: "Dev Patel", load: 7, role: "Admin" },
-  { name: "Priya Shah", load: 5, role: "Member" },
-  { name: "Arjun Mehta", load: 4, role: "Member" },
-];
+import Brand from "../../components/Brand/Brand";
+import { useAuth } from "../../context/AuthContext";
+import "../../styles/public.css";
 
 export default function Home() {
-  return (
-    <>
-      <section className="dashboard-hero">
-        <div className="hero-content">
-          <p className="section-kicker">Real-time engineering visibility</p>
-          <h1>Track work, team activity, and delivery health in one place.</h1>
-          <p>
-            DevPulse combines a Kanban task board, live team activity, and
-            productivity analytics for small engineering teams.
-          </p>
-
-          <div className="hero-actions">
-            <Button to="/signup" variant="primary">
-              Start tracking
-            </Button>
-            <Button to="/login" variant="secondary">
-              View demo access
-            </Button>
-          </div>
+  const { isAuthenticated } = useAuth();
+  if (isAuthenticated) return <Navigate to="/dashboard" replace />;
+  return <div className="public-page">
+    <header className="public-header"><Brand /><nav aria-label="Public navigation"><Link to="/login">Sign in</Link><Button to="/signup">Get started<ArrowUpRight size={16} /></Button></nav></header>
+    <main>
+      <section className="landing-hero">
+        <img className="landing-product-background" src="/workspace-preview.png" alt="DevPulse dashboard with example project and task data" />
+        <div className="landing-hero-copy"><p className="section-kicker">A shared space for moving work forward</p><h1>DevPulse<span>.</span></h1>
+          <p className="landing-statement">Less chasing updates.<br />More meaningful progress.</p>
+          <div className="landing-actions"><Button to="/signup">Create your account<ArrowRight size={17} /></Button><Link to="/login">Already a member? Sign in</Link></div>
         </div>
-
-        <aside className="hero-summary" aria-label="Current team summary">
-          <div>
-            <span className="summary-label">Sprint health</span>
-            <strong>On track</strong>
-          </div>
-          <div className="summary-meter" aria-hidden="true">
-            <span></span>
-          </div>
-          <p>76% of active work is moving through review or completion.</p>
-        </aside>
+        <span className="landing-caption">Example workspace</span>
       </section>
-
-      <section className="stats-grid" aria-label="Productivity metrics">
-        {stats.map((item) => (
-          <article className="metric-card" key={item.label}>
-            <span>{item.label}</span>
-            <strong>{item.value}</strong>
-            <p>{item.change}</p>
-          </article>
-        ))}
+      <section className="landing-principles" aria-label="Your workspace"><div><span>01 / People</span><UsersRound size={24} /><h2>Bring your team together.</h2><p>Shared projects, clear ownership, and a place for everyone's work.</p></div>
+        <div><span>02 / Projects</span><Layers3 size={24} /><h2>Give work a little structure.</h2><p>From the first task to the final review, keep the whole project in view.</p></div>
+        <div><span>03 / Perspective</span><ChartNoAxesCombined size={24} /><h2>See what needs your attention.</h2><p>Your priorities and your team's progress, in one considered workspace.</p></div>
       </section>
-
-      <section className="dashboard-grid">
-        <div className="work-card board-card">
-          <div className="section-heading">
-            <div>
-              <p className="section-kicker">Task board</p>
-              <h2>Current workflow</h2>
-            </div>
-            <span>Team Alpha</span>
-          </div>
-
-          <div className="kanban-preview">
-            {board.map((column) => (
-              <article className="kanban-column" key={column.title}>
-                <header>
-                  <strong>{column.title}</strong>
-                  <span>{column.count}</span>
-                </header>
-                {column.tasks.map((task) => (
-                  <p key={task}>{task}</p>
-                ))}
-              </article>
-            ))}
-          </div>
-        </div>
-
-        <aside className="work-card activity-card">
-          <div className="section-heading">
-            <div>
-              <p className="section-kicker">Live feed</p>
-              <h2>Team updates</h2>
-            </div>
-          </div>
-
-          <ul className="activity-list">
-            {activity.map((item) => (
-              <li key={item}>{item}</li>
-            ))}
-          </ul>
-        </aside>
-
-        <aside className="work-card workload-card">
-          <div className="section-heading">
-            <div>
-              <p className="section-kicker">Workload</p>
-              <h2>Member load</h2>
-            </div>
-          </div>
-
-          <div className="member-list">
-            {members.map((member) => (
-              <div className="member-row" key={member.name}>
-                <span>
-                  <strong>{member.name}</strong>
-                  <small>{member.role}</small>
-                </span>
-                <b>{member.load}</b>
-              </div>
-            ))}
-          </div>
-        </aside>
-      </section>
-    </>
-  );
+      <section className="landing-close"><div><p className="section-kicker">Your next chapter of work</p><h2>Make room for focus.</h2></div><Button to="/signup">Start your workspace<ArrowUpRight size={17} /></Button></section>
+    </main>
+    <footer className="public-footer"><Brand compact /><span>Thoughtfully built for small engineering teams.</span><Link to="/login">Sign in<ArrowUpRight size={14} /></Link></footer>
+  </div>;
 }

@@ -10,7 +10,29 @@ lerna-debug.log*
 node_modules
 dist
 dist-ssr
+test-results
+playwright-report
 *.local
+
+# Environment files
+.env
+.env.*
+*.env
+!.env.example
+
+# Database backups
+backups/
+*.dump
+*.bak
+*.backup
+
+# Private keys and keystores
+*.pem
+*.key
+*.p12
+*.pfx
+*.jks
+*.keystore
 
 # Editor directories and files
 .vscode/*

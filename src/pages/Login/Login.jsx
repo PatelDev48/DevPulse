@@ -1,23 +1,26 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, Navigate, useLocation, useNavigate } from "react-router-dom";
+import { ArrowRight } from "lucide-react";
+import AuthLayout from "../../layouts/AuthLayout";
+import PasswordField from "../../components/PasswordField/PasswordField";
 import Button from "../../components/Button/Button";
-import "../../styles/auth.css";
-
-const highlights = [
-  "Jump back into your team board and live feed",
-  "Review task movement, blockers, and delivery signals",
-  "Designed for small engineering teams moving fast",
-];
+import { useAuth } from "../../context/AuthContext";
+import { login as loginRequest } from "../../services/authService";
+import { authDestination } from "../../routes/authDestination";
 
 export default function Login() {
   const navigate = useNavigate();
-  const [email, setEmail] = useState("");
+  const location = useLocation();
+  const { login, isAuthenticated } = useAuth();
+  const [email, setEmail] = useState(location.state?.signupComplete ? location.state.email : "");
   const [password, setPassword] = useState("");
-  const [remember, setRemember] = useState(true);
   const [error, setError] = useState("");
+  const [submitting, setSubmitting] = useState(false);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (submitting) return;
 
     if (!email.trim() || !password.trim()) {
       setError("Please enter your email and password.");
@@ -25,37 +28,34 @@ export default function Login() {
     }
 
     setError("");
-    console.log("Logging in with:", { email, password, remember });
-    navigate("/home");
+    setSubmitting(true);
+    try {
+      const session = await loginRequest({ email: email.trim(), password });
+      login(session);
+      const destination = authDestination(location.state?.from);
+      navigate(destination, { replace: true });
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setSubmitting(false);
+    }
   };
 
+  if (isAuthenticated) return <Navigate to={authDestination(location.state?.from)} replace />;
   return (
-    <main className="auth-shell">
-      <section className="auth-panel auth-panel--intro" aria-label="Product overview">
-        <p className="auth-eyebrow">DevPulse access</p>
-        <h1 className="auth-headline">Return to your engineering command center</h1>
-        <p className="auth-copy">
-          Continue tracking team activity, task progress, and productivity
-          signals from one focused workspace.
-        </p>
-
-        <ul className="auth-points" aria-label="Benefits">
-          {highlights.map((point) => (
-            <li key={point}>{point}</li>
-          ))}
-        </ul>
-      </section>
-
-      <section className="auth-card" aria-label="Login form">
+    <AuthLayout>
         <div className="auth-card__header">
           <p className="auth-tag">Welcome back</p>
-          <h2 className="auth-title">Sign in to DevPulse</h2>
+          <h1 className="auth-title">Sign in to DevPulse</h1>
           <p className="auth-subtitle">
             Use your work email and password to continue.
           </p>
         </div>
 
         <form className="auth-form" onSubmit={handleSubmit}>
+          {location.state?.signupComplete && (
+            <p className="auth-subtitle" role="status">Account created successfully.</p>
+          )}
           <label className="auth-field">
             <span>Email address</span>
             <input
@@ -63,49 +63,35 @@ export default function Login() {
               className="auth-input"
               placeholder="name@company.com"
               autoComplete="email"
+              required
+              maxLength={254}
+              disabled={submitting}
               value={email}
               onChange={(e) => setEmail(e.target.value)}
             />
           </label>
 
-          <label className="auth-field">
-            <span>Password</span>
-            <input
-              type="password"
-              className="auth-input"
+            <PasswordField
+              id="login-password"
               placeholder="Enter your password"
               autoComplete="current-password"
+              required
+              maxLength={72}
+              disabled={submitting}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
             />
-          </label>
 
-          <div className="auth-row">
-            <label className="auth-check">
-              <input
-                type="checkbox"
-                checked={remember}
-                onChange={(e) => setRemember(e.target.checked)}
-              />
-              <span>Remember me</span>
-            </label>
+          {error && <p className="auth-error" role="alert">{error}</p>}
 
-            <button type="button" className="auth-link">
-              Forgot password?
-            </button>
-          </div>
-
-          {error && <p className="auth-error">{error}</p>}
-
-          <Button type="submit" variant="primary" block>
-            Sign in
+          <Button type="submit" variant="primary" block disabled={submitting}>
+            {submitting ? "Signing in\u2026" : "Sign in"}<ArrowRight size={17} aria-hidden="true" />
           </Button>
 
           <p className="auth-footer">
-            Don&apos;t have an account? <Link to="/signup">Create one</Link>
+            Don&apos;t have an account? <Link to="/signup" state={{ from: authDestination(location.state?.from) }}>Create one</Link>
           </p>
         </form>
-      </section>
-    </main>
+    </AuthLayout>
   );
 }
