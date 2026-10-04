@@ -1,15 +1,14 @@
 import { useState } from "react";
-import { Link, Navigate, useLocation, useNavigate } from "react-router-dom";
+import { Link, Navigate, useLocation } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
 import AuthLayout from "../../layouts/AuthLayout";
 import PasswordField from "../../components/PasswordField/PasswordField";
 import { useAuth } from "../../context/AuthContext";
 import Button from "../../components/Button/Button";
-import { signup as signupRequest } from "../../services/authService";
 import { authDestination } from "../../routes/authDestination";
+import { supabase } from '../../supabaseClient';
 
 export default function Signup() {
-  const navigate = useNavigate();
   const location = useLocation();
   const { isAuthenticated } = useAuth();
   const [name, setName] = useState("");
@@ -18,6 +17,7 @@ export default function Signup() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const [verificationSent, setVerificationSent] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -42,10 +42,26 @@ export default function Signup() {
     setError("");
     setSubmitting(true);
     try {
-      const user = await signupRequest({ name: name.trim(), email: email.trim(), password });
-      navigate("/login", { replace: true, state: {
-        signupComplete: true, email: user.email, from: authDestination(location.state?.from),
-      } });
+      const destination = authDestination(location.state?.from);
+      const redirectUrl = new URL("/", window.location.origin);
+      redirectUrl.searchParams.set("next", destination);
+
+      const { error } = await supabase.auth.signUp({
+        email: email.trim(),
+        password,
+        options: {
+          data: {
+            name: name.trim(),
+          },
+          emailRedirectTo: redirectUrl.toString(),
+        },
+      });
+
+      if (error) {
+        throw error;
+      }
+
+      setVerificationSent(true);
     } catch (err) {
       setError(err.message);
     } finally {
@@ -54,6 +70,24 @@ export default function Signup() {
   };
 
   if (isAuthenticated) return <Navigate to={authDestination(location.state?.from)} replace />;
+  if (verificationSent) {
+    return (
+      <AuthLayout label="Email confirmation">
+        <div className="auth-card__header">
+          <p className="auth-tag">Check your inbox</p>
+          <h1 className="auth-title">Confirm your email</h1>
+          <p className="auth-subtitle">
+            We sent a confirmation link to <strong>{email.trim()}</strong>.
+            Open it to confirm your address and continue to DevPulse.
+          </p>
+        </div>
+        <p className="auth-footer">
+          Already confirmed? <Link to="/login">Sign in</Link>
+        </p>
+      </AuthLayout>
+    );
+  }
+
   return (
     <AuthLayout signup>
         <div className="auth-card__header">

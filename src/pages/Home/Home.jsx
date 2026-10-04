@@ -3,11 +3,15 @@ import { ArrowUpRight, ArrowRight, Layers3, ChartNoAxesCombined, UsersRound } fr
 import Button from "../../components/Button/Button";
 import Brand from "../../components/Brand/Brand";
 import { useAuth } from "../../context/AuthContext";
+import { authDestination } from "../../routes/authDestination";
 import "../../styles/public.css";
 
 export default function Home() {
   const { isAuthenticated } = useAuth();
-  if (isAuthenticated) return <Navigate to="/dashboard" replace />;
+  if (isAuthenticated) {
+    const next = new URLSearchParams(window.location.search).get("next");
+    return <Navigate to={authDestination(next)} replace />;
+  }
   return <div className="public-page">
     <header className="public-header"><Brand /><nav aria-label="Public navigation"><Link to="/login">Sign in</Link><Button to="/signup">Get started<ArrowUpRight size={16} /></Button></nav></header>
     <main>

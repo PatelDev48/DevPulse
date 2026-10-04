@@ -33,6 +33,31 @@ public class UserRepository {
 				""", USER_ROW_MAPPER, UUID.randomUUID(), name, normalizedEmail, passwordHash);
 	}
 
+	public Optional<User> findBySupabaseUserId(UUID supabaseUserId) {
+    return DataAccessUtils.optionalResult(jdbcTemplate.query("""
+            SELECT id, name, email, password_hash, created_at
+            FROM devpulse.users
+            WHERE supabase_user_id = ?
+            """, USER_ROW_MAPPER, supabaseUserId));
+	}
+
+	public Optional<User> linkSupabaseUserId(UUID userId, UUID supabaseUserId) {
+		return DataAccessUtils.optionalResult(jdbcTemplate.query("""
+				UPDATE devpulse.users
+				SET supabase_user_id = ?
+				WHERE id = ? AND supabase_user_id IS NULL
+				RETURNING id, name, email, password_hash, created_at
+				""", USER_ROW_MAPPER, supabaseUserId, userId));
+	}
+
+	public User createSupabaseUser(UUID supabaseUserId, String name, String normalizedEmail) {
+		return jdbcTemplate.queryForObject("""
+				INSERT INTO devpulse.users (id, name, email, password_hash, supabase_user_id)
+				VALUES (?, ?, ?, NULL, ?)
+				RETURNING id, name, email, password_hash, created_at
+				""", USER_ROW_MAPPER, supabaseUserId, name, normalizedEmail, supabaseUserId);
+	}
+
 	public Optional<User> findByEmail(String normalizedEmail) {
 		return DataAccessUtils.optionalResult(jdbcTemplate.query("""
 				SELECT id, name, email, password_hash, created_at

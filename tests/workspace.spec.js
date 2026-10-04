@@ -32,6 +32,24 @@ async function fixture(page, role = "OWNER") {
     { title: "Add keyboard focus tests", description: "Cover project dialogs", status: "TODO", priority: "MEDIUM", assigneeId: null },
   ].map((task, index) => ({ ...task, id: `40000000-0000-4000-8000-00000000000${index}`, projectId, createdBy: user.id, createdAt: timestamp, updatedAt: timestamp }));
   const state = { teams, projects, tasks, members, fail: "", writes: [] };
+  await page.route("**/auth/v1/**", async (route) => {
+    const request = route.request();
+    const url = new URL(request.url());
+    if (url.pathname.endsWith("/signup")) {
+      state.signupRedirect = url.searchParams.get("redirect_to");
+      return route.fulfill({ status: 200, json: { id: user.id, aud: "authenticated", role: "authenticated", email: user.email, user_metadata: { name: user.name } } });
+    }
+    if (url.pathname.endsWith("/token")) {
+      return route.fulfill({ status: 200, json: {
+        access_token: "ui-fixture-only",
+        token_type: "bearer",
+        expires_in: 3600,
+        refresh_token: "ui-fixture-refresh-only",
+        user: { id: user.id, email: user.email, email_confirmed_at: timestamp, user_metadata: { name: user.name } },
+      } });
+    }
+    return route.fulfill({ status: 200, json: {} });
+  });
   await page.route("**/api/**", async (route) => {
     const request = route.request();
     const url = new URL(request.url());
@@ -131,12 +149,11 @@ test("signup validation, password visibility and invitation return", async ({ pa
   await page.getByRole("button", { name: "Hide password", exact: true }).click();
   await expect(page.getByLabel("Password", { exact: true })).toHaveAttribute("type", "password");
   await page.getByRole("button", { name: "Create account", exact: true }).click();
-  await expect(page.getByRole("status")).toHaveText("Account created successfully.");
-  await expect(page.getByLabel("Email address")).toHaveValue(user.email);
-  await page.getByLabel("Password", { exact: true }).fill("fixture password only");
-  await page.getByRole("button", { name: "Sign in", exact: true }).click();
-  await expect(page).toHaveURL(new RegExp(`/invite#${"a".repeat(43)}$`));
-  await expect(page.getByRole("button", { name: "Join team", exact: true })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Confirm your email" })).toBeVisible();
+  await expect(page.getByText(user.email)).toBeVisible();
+  const confirmationRedirect = new URL(state.signupRedirect);
+  expect(confirmationRedirect.searchParams.get("next")).toBe(invitation);
+  expect(state.writes).toHaveLength(0);
 });
 
 test("team and project creation/search lead to the correct board", async ({ page }) => {

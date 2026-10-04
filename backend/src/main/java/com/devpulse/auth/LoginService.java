@@ -32,13 +32,16 @@ public class LoginService {
 		}
 
 		var user = userRepository.findByEmail(normalizedEmail);
-		String passwordHash = user.map(account -> account.passwordHash()).orElse(dummyPasswordHash);
+		var account = user.orElse(null);
+		String passwordHash = account == null || account.passwordHash() == null
+				? dummyPasswordHash
+				: account.passwordHash();
 		boolean passwordMatches = passwordEncoder.matches(password, passwordHash);
-		if (user.isEmpty() || !passwordMatches) {
+
+		if (account == null || account.passwordHash() == null || !passwordMatches) {
 			throw new InvalidCredentialsException();
 		}
 
-		var account = user.orElseThrow();
 		return new LoginResult(account.id(), account.name(), account.email(), account.createdAt());
 	}
 

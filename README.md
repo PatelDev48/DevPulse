@@ -47,11 +47,27 @@ No LLM, external AI calls, vector database, or RAG pipeline is enabled. Structur
 
 ### Run and Verify
 
-Restart the backend in the terminal with its existing database/JWT environment to apply Flyway V7 and load the lifecycle/dashboard endpoints:
+Use `.env.example` as a template and add its database entries to the ignored root `.env` without overwriting your existing Supabase values. For an existing database, the three database password values must match the `devpulse`, `devpulse_app`, and `devpulse_migrator` roles. Spring Boot and Docker Compose read this root `.env`; keep real credentials out of source control.
+
+Start the backend and its local PostgreSQL service with:
 
 ```sh
-./backend/mvnw -f backend/pom.xml spring-boot:run -Dspring-boot.run.arguments=--server.port=8082
+./scripts/run-backend.sh
 ```
+
+The app connects to `localhost:5432/devpulse` as `devpulse_app`; Flyway connects to the same database as `devpulse_migrator`. The migrator owns schema `devpulse` and creates application objects there. The runtime role receives only the schema/table/column grants declared by migrations; it does not need database or schema creation rights.
+
+For a brand-new PostgreSQL volume, initialize the roles and schema once as the Compose admin before starting the backend. Run `docker compose exec postgres psql -U devpulse -d devpulse`, then enter these commands in `psql`; `\password` prompts without echoing credentials:
+
+```sql
+CREATE ROLE devpulse_migrator LOGIN;
+\password devpulse_migrator
+CREATE ROLE devpulse_app LOGIN;
+\password devpulse_app
+CREATE SCHEMA devpulse AUTHORIZATION devpulse_migrator;
+```
+
+Do not reset an existing schema to resolve a Flyway validation error. This database has an applied V8 `pending_signups` migration whose original script is unavailable in the workspace. Flyway's missing-versioned-migration ignore setting is broader than V8, so keep every available migration file in source control and never delete or edit an applied migration. New changes must use a new version.
 
 Run the frontend with `npm run dev` and open the URL Vite reports. Frontend checks: `npm run lint` and `npm run build`. Backend checks: `./backend/mvnw -f backend/pom.xml test` against a disposable PostgreSQL instance configured through the database environment variables. Do not point integration tests at valuable development or production data.
 
